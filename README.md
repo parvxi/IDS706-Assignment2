@@ -12,7 +12,7 @@
 
 ---
 
-## 🎯 Project Goal
+## Project Goal
 
 This is **Series 1 of a 3-week mini-project** for IDS706. The goal is to take a beginner-friendly dataset through a full first-pass data analysis workflow: load it, inspect it, clean it, filter/group it, run it through a simple machine learning model, and visualize what's going on — all while documenting the reasoning along the way, since I'll be reusing this same dataset next week for testing, CI, and refactoring.
 
@@ -22,7 +22,7 @@ The question I set out to explore:
 
 ---
 
-## 📦 Dataset
+## Dataset
 
 **[Sleep Health and Lifestyle Dataset](https://www.kaggle.com/datasets/uom190346a/sleep-health-and-lifestyle-dataset)** (Kaggle)
 
@@ -32,7 +32,7 @@ The question I set out to explore:
 
 ---
 
-## 🛠️ Setup & How to Run
+## Setup & How to Run
 
 **1. Clone the repo and move into it**
 ```powershell
@@ -60,7 +60,7 @@ The script prints every step to the terminal and (re)generates the plots inside 
 
 ---
 
-## 🔍 Analysis Steps
+## Analysis Steps
 
 The script ([`EDA_Dataset.py`](EDA_Dataset.py)) is organized into clearly labeled sections, in order:
 
@@ -80,20 +80,20 @@ The script ([`EDA_Dataset.py`](EDA_Dataset.py)) is organized into clearly labele
 
 `.info()` and `.describe()` showed 13 columns with no missing values — **except** `Sleep Disorder`, which had 219 nulls out of 374 rows. `.duplicated()` found 0 fully identical rows (every `Person ID` is unique), but **242 rows become duplicates once `Person ID` is dropped**, meaning the dataset really only has 132 distinct lifestyle "profiles" repeated across different people.
 
-### 🧹 Cleaning decisions
+### Cleaning decisions
 
 - **`Sleep Disorder` NaNs → `"No Disorder"`** — the dataset's original `"None"` string was auto-interpreted by Pandas as a missing value. Since that's actually a valid category (no disorder), I relabeled it instead of dropping 219 of 374 rows.
 - **`"Normal Weight"` merged into `"Normal"`** — same BMI category, just an inconsistent label.
 - **`Blood Pressure` ("126/83") split into `Systolic` / `Diastolic`** — so it can be used as numeric input later in the regression.
 
-### 🔢 Filtering & grouping (the interesting part)
+### Filtering & grouping (the interesting part)
 
 | Group | Records | Avg. Sleep Duration | Avg. Sleep Quality |
 |---|---|---|---|
 | High stress (level ≥ 7) | 120 | 6.22 hrs | 5.92 / 10 |
 | Low stress (level ≤ 4) | 141 | 7.63 hrs | 8.33 / 10 |
 
-Grouping average sleep quality by stress level shows a clear downward trend from **8.97 (stress 3) down to 5.86 (stress 8)**. The correlation between `Stress Level` and `Quality of Sleep` came out to **-0.90** — a strong negative relationship.
+Grouping average sleep quality by stress level shows a clear downward trend from **8.97 (stress 3) down to 5.86 (stress 8)**. The correlation between `Stress Level` and `Quality of Sleep` came out to **-0.90** a strong negative relationship.
 
 Sleep by BMI category also stood out:
 
@@ -103,7 +103,7 @@ Sleep by BMI category also stood out:
 | Overweight | 6.77 hrs | 6.90 | 148 |
 | Obese | 6.96 hrs | 6.40 | 10 |
 
-I also ran every grouping on distinct profiles only (with the 242 repeated rows removed), to make sure the repetition in the dataset wasn't skewing the picture — the direction of every result held up.
+I also ran every grouping on distinct profiles only (with the 242 repeated rows removed), to make sure the repetition in the dataset wasn't skewing the picture the direction of every result held up.
 
 ### 🐼 vs 🐻‍❄️ Pandas vs. Polars
 
@@ -114,51 +114,51 @@ I re-ran the same filters and `groupby`/`group_by` operations in both libraries 
 | Pandas | 6.223 ms |
 | Polars | **2.184 ms** |
 
-Polars came out ~2.8× faster here. That said, with only 374 rows this is really more of a syntax comparison than a real performance benchmark — Polars' advantages tend to show up on much larger datasets.
+Polars came out ~2.8× faster here. That said, with only 374 rows this is really more of a syntax comparison than a real performance benchmark, Polars advantages tend to show up on much larger datasets.
 
 ---
 
-## 🤖 Machine Learning
+## Machine Learning
 
 **Algorithm:** Linear Regression (`scikit-learn`)
 
 **Target:** `Quality of Sleep`
 **Features:** `Age`, `Sleep Duration`, `Physical Activity Level`, `Stress Level`, `Heart Rate`, `Daily Steps`, `Systolic`, `Diastolic`
 
-I picked linear regression as a simple, interpretable baseline since the target and all selected features are numeric — a good first model before trying anything more complex. Data was split 80/20 for train/test.
+I picked linear regression as a simple, interpretable baseline since the target and all selected features are numeric. then I split the data 80/20 for train/test.
 
 | Run | n | MAE | R² |
 |---|---|---|---|
 | All rows | 374 | 0.27 | **0.93** |
 | Repeated profiles removed | 132 | 0.29 | **0.90** |
 
-**Takeaway:** R² only dropped from 0.93 to 0.90 after removing the 242 duplicated profiles, so the strong fit isn't just an artifact of repeated rows — it's mostly being driven by how tightly `Stress Level` tracks `Quality of Sleep` (r = -0.90). Since this is a **synthetic** dataset, these patterns describe this dataset well but shouldn't be over-generalized to real-world sleep behavior.
+**Takeaway:** R² only dropped from 0.93 to 0.90 after removing the 242 duplicated profiles, so the strong fit isn't just an artifact of repeated rows it's mostly being driven by how tightly `Stress Level` tracks `Quality of Sleep` (r = -0.90). Since this is a **synthetic** dataset, these patterns describe this dataset well but shouldn't be over-generalized to real-world sleep behavior.
 
 ---
 
-## 📈 Visualization
+## Visualization
 
 **Main plot — Average Sleep Quality by Stress Level**
 
 <img src="images/average_sleep_quality_by_stress.png" alt="Bar chart of average sleep quality by stress level" width="600">
 
-A bar chart was the right call here: `Stress Level` only has 6 distinct values, so comparing their average `Quality of Sleep` directly answers the project's main question at a glance — quality drops steadily as stress climbs.
+A bar chart was the right call here: `Stress Level` only has 6 distinct values, so comparing their average `Quality of Sleep` directly answers the project's main question at a glance quality drops steadily as stress climbs.
 
 **Supporting plot 1 — Sleep Quality distribution by Stress Level (boxplot)**
 
 <img src="images/stress_vs_quality.png" alt="Boxplot of sleep quality distribution across stress levels" width="600">
 
-The boxplot adds what the bar chart can't show: spread. It confirms the downward trend isn't just about averages — the whole distribution shifts down and the values get more consistent (less spread) at higher stress levels.
+The boxplot adds what the bar chart can't show: spread. It confirms the downward trend isn't just about averages the whole distribution shifts down and the values get more consistent (less spread) at higher stress levels.
 
 **Supporting plot 2 — Sleep Disorders by BMI Category**
 
 <img src="images/bmi_vs_sleep_disorder.png" alt="Stacked bar chart of sleep disorders by BMI category" width="600">
 
-A stacked bar chart to explore a second angle: among Normal BMI records, roughly 93% report no sleep disorder. Among Overweight records that flips almost completely — only about 13% have no disorder, with the rest split fairly evenly between Insomnia and Sleep Apnea. A relationship worth digging into further next week.
+A stacked bar chart to explore a second angle: among Normal BMI records, roughly 93% report no sleep disorder. Among Overweight records that flips almost completely, only about 13% have no disorder, with the rest split fairly evenly between Insomnia and Sleep Apnea. A relationship worth digging into further next week.
 
 ---
 
-## 🦀 Question 2 — Rust & Ownership
+## 🦀 🦀 🦀 Question 2 — Rust & Ownership 🦀 🦀 🦀
 
 Worked through [`notebooks/rust_vs_python_intro.ipynb`](notebooks/rust_vs_python_intro.ipynb) using the `evcxr_jupyter` Rust kernel, completing all the *Your turn* exercises and deliberately triggering compiler errors to see the ownership rules enforced:
 
@@ -174,14 +174,7 @@ What stuck with me is the trade-off. Rust made me say in advance which values co
 
 ---
 
-## ✅ Status
-
-- [x] **Question 1** — Dataset import, inspection, cleaning, filtering/grouping, Pandas vs. Polars, ML exploration, visualization, documentation
-- [x] **Question 2** — Ran the Rust notebook and completed the ownership exercises (`mut`, move vs. `.clone()`, borrowing), with all cell outputs and compiler errors saved
-
----
-
-## 📁 Repo Structure
+## Repo Structure
 
 ```
 IDS706-Assignment2/
