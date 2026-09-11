@@ -1,4 +1,4 @@
-# IDS706 — Week 2 Mini-Assignment: Sleep, Stress & Lifestyle Analysis
+# IDS706 Week 2 Mini-Assignment: Sleep, Stress & Lifestyle Analysis
 
 ![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)
 ![Pandas](https://img.shields.io/badge/Pandas-3.0-150458?logo=pandas&logoColor=white)
