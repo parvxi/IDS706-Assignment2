@@ -14,7 +14,7 @@
 
 ## Project Goal
 
-This is **Series 1 of a 3-week mini-project** for IDS706. The goal is to take a beginner-friendly dataset through a full first-pass data analysis workflow: load it, inspect it, clean it, filter/group it, run it through a simple machine learning model, and visualize what's going on — all while documenting the reasoning along the way, since I'll be reusing this same dataset next week for testing, CI, and refactoring.
+This is **Series 1 of a 3-week mini-project** for IDS706. The goal is to take a beginner-friendly dataset through a full first-pass data analysis workflow: load it, inspect it, clean it, filter/group it, run it through a simple machine learning model, and visualize what's going on all while documenting the reasoning along the way, since I'll be reusing this same dataset next week for testing, CI, and refactoring.
 
 The question I set out to explore:
 
@@ -78,7 +78,7 @@ The script ([`EDA_Dataset.py`](EDA_Dataset.py)) is organized into clearly labele
 
 ### Inspecting the data
 
-`.info()` and `.describe()` showed 13 columns with no missing values — **except** `Sleep Disorder`, which had 219 nulls out of 374 rows. `.duplicated()` found 0 fully identical rows (every `Person ID` is unique), but **242 rows become duplicates once `Person ID` is dropped**, meaning the dataset really only has 132 distinct lifestyle "profiles" repeated across different people.
+`.info()` and `.describe()` showed 13 columns with no missing values **except** `Sleep Disorder`, which had 219 nulls out of 374 rows. `.duplicated()` found 0 fully identical rows (every `Person ID` is unique), but **242 rows become duplicates once `Person ID` is dropped**, meaning the dataset really only has 132 distinct lifestyle "profiles" repeated across different people.
 
 ### Cleaning decisions
 
