@@ -304,7 +304,9 @@ In Python, I normally do not think much about who owns a list or whether a varia
 
 The `.clone()` example also helped me understand that copying data is an actual operation with a cost. Rust makes me ask for that copy explicitly instead of doing it without thinking about it.
 
-I am still new to Rust, but experimenting with the errors helped the ownership rules make more sense to me than only reading about them.
+The notebook shows borrowing with & but does not have an exercise for it, so I added a cell to try it myself. Both names still worked and nothing was copied, which showed me there is a third option besides moving or cloning.
+
+**Note:** I am still new to Rust, but experimenting with the errors helped the ownership rules make more sense to me than only reading about them.
 
 ---
 
