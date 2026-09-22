@@ -1,5 +1,6 @@
 import os
 import sys
+import time
 
 import pandas as pd
 import pytest
@@ -108,6 +109,7 @@ def test_full_pipeline():
     project_folder = os.path.join(os.path.dirname(__file__), "..")
     os.chdir(project_folder)
 
+    start = time.time()
     df = eda.main()
 
     assert df.shape == (374, 15)
@@ -117,7 +119,9 @@ def test_full_pipeline():
         "bmi_vs_sleep_disorder.png",
         "stress_vs_quality.png",
     ]:
-        assert os.path.exists(os.path.join("images", plot))
+        path = os.path.join("images", plot)
+        # the plot must be saved again by main(), not just left over from before
+        assert os.path.getmtime(path) >= start
 
 
-# to run write "pytest" in the termianl
+# to run write "pytest" in the terminal

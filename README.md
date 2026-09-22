@@ -43,9 +43,20 @@ cd IDS706-Assignment2
 
 ### 2. Create and activate a virtual environment
 
+Requires **Python 3.12 or newer**.
+
+Windows (PowerShell):
+
 ```powershell
 python -m venv .venv
 .venv\Scripts\Activate.ps1
+```
+
+macOS / Linux:
+
+```bash
+python3.12 -m venv .venv
+source .venv/bin/activate
 ```
 
 ### 3. Install the requirements
