@@ -1,4 +1,6 @@
-# IDS706 Week 2 Mini-Assignment: Sleep, Stress & Lifestyle Analysis
+# IDS706 Week 3 Mini-Assignment: Sleep, Stress & Lifestyle Analysis
+
+[![CI](https://github.com/parvxi/IDS706-Assignment2/actions/workflows/ci.yml/badge.svg)](https://github.com/parvxi/IDS706-Assignment2/actions/workflows/ci.yml)
 
 <img src="images/stress-image-readme.jpg" alt="Illustration of someone lying awake, stressed and unable to sleep" width="600">
 
@@ -10,7 +12,8 @@ The main question I wanted to explore was:
 
 **Which lifestyle factors line up with sleep quality, and can a simple regression predict it?**
 
-This is Series 1 of the 3-week project. For this week, I focused on understanding and cleaning the dataset, filtering and grouping the data, comparing Pandas and Polars, trying a simple machine learning model, and creating a few visualizations.
+This is Series 1 of the 3-week project. In Week 3, I added automated tests and a GitHub Actions workflow so the tests run whenever I push changes to the repository. Earlier in the project, I focused on understanding and cleaning the dataset, filtering and grouping the data, comparing Pandas and Polars, trying a simple machine learning model, and creating a few visualizations.
+
 
 ---
 
@@ -279,6 +282,44 @@ This was not my main research question, but it was another relationship in the d
 
 ---
 
+## Testing
+
+I split the main script into smaller functions so that each part of the analysis could be tested separately instead of only checking whether the full script runs.
+
+The tests cover the main parts of the project:
+
+| Test Area      | What I Check                                                                             |
+| -------------- | ---------------------------------------------------------------------------------------- |
+| Data loading   | The dataset loads correctly and has the expected columns                                 |
+| Cleaning       | Missing sleep disorders, BMI categories, and blood pressure values are cleaned correctly |
+| Stress summary | The stress-level grouping returns the expected averages                                  |
+| Model          | The Linear Regression model trains and returns valid results                             |
+| Full pipeline  | The main analysis can run from start to finish without errors                            |
+
+I also included a few edge cases. These check what happens if the dataset file is missing, if a very small table is passed into the analysis, and whether the model gives reproducible results when the same random state is used.
+
+To run all of the tests:
+
+```bash
+pytest
+```
+
+The tests currently pass successfully:
+
+![Tests passing](images/pytest_passing.png)
+
+---
+
+## Continuous Integration
+
+I added a GitHub Actions workflow to automatically run the tests every time I push changes to the repository. This helps make sure the code still works and that new changes do not break the existing tests.
+
+![GitHub Actions passing](images/github_actions_passing.png)
+
+![GitHub Actions passing - test details](images/github_actions_passing2.png)
+
+---
+
 ## Question 2: Rust and Ownership
 
 For the Rust part, I worked through:
@@ -315,6 +356,10 @@ The notebook shows borrowing with & but does not have an exercise for it, so I a
 ```text
 IDS706-Assignment2/
 │
+├── .github/
+│   └── workflows/
+│       └── ci.yml
+│
 ├── data/
 │   └── Sleep_health_and_lifestyle_dataset.csv
 │
@@ -322,12 +367,19 @@ IDS706-Assignment2/
 │   ├── stress-image-readme.jpg
 │   ├── average_sleep_quality_by_stress.png
 │   ├── stress_vs_quality.png
-│   └── bmi_vs_sleep_disorder.png
+│   ├── bmi_vs_sleep_disorder.png
+│   ├── github_actions_passing.png
+│   ├── github_actions_passing2.png
+│   └── pytest_passing.png
 │
 ├── notebooks/
 │   └── rust_vs_python_intro.ipynb
 │
+├── tests/
+│   └── test_analysis.py
+│
 ├── EDA_Dataset.py
+├── pytest.ini
 ├── requirements.txt
 └── README.md
 ```

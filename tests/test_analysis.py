@@ -90,7 +90,7 @@ def test_regression_results():
 
 def test_regression_is_reproducible():
     print("\n" + "-" * 50)
-    print("🤖 🤖 🤖 Testing the model reproduciblilty 🤖 🤖 🤖")
+    print("🤖 🤖 🤖 Testing the model reproducibility 🤖 🤖 🤖")
     print("-" * 50)
     df = eda.clean_data(eda.load_data(CSV))
     first = eda.run_regression(df, "first")

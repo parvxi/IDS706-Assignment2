@@ -82,7 +82,7 @@ def stress_summary(df):
 
 
 def run_regression(data, label):
-    """Fit a linear regression and print how well it did."""
+    """Fit a linear regression and print how well it did and return the results"""
     X = data[FEATURES]
     y = data[TARGET]
 
