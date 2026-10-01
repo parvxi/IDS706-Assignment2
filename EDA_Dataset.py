@@ -82,6 +82,13 @@ def stress_summary(df):
     return df.groupby("Stress Level")["Quality of Sleep"].mean()
 
 
+def print_group_summary(label, group):
+    """Print how many records a group has and its average sleep numbers."""
+    print(f"\n{label} records:", len(group))
+    print("Average sleep duration:", round(group["Sleep Duration"].mean(), 2))
+    print("Average sleep quality:", round(group["Quality of Sleep"].mean(), 2))
+
+
 # --- Machine learning ---
 
 
@@ -176,14 +183,8 @@ def main():
 
     high_stress = df[df["Stress Level"] >= HIGH_STRESS]
     low_stress = df[df["Stress Level"] <= LOW_STRESS]
-
-    print("\nHigh-stress records:", len(high_stress))
-    print("Average sleep duration:", round(high_stress["Sleep Duration"].mean(), 2))
-    print("Average sleep quality:", round(high_stress["Quality of Sleep"].mean(), 2))
-
-    print("\nLow-stress records:", len(low_stress))
-    print("Average sleep duration:", round(low_stress["Sleep Duration"].mean(), 2))
-    print("Average sleep quality:", round(low_stress["Quality of Sleep"].mean(), 2))
+    print_group_summary("High-stress", high_stress)
+    print_group_summary("Low-stress", low_stress)
 
     short_sleep = df[df["Sleep Duration"] < SHORT_SLEEP_HOURS]
     print("\nRecords with under 6 hours of sleep:")
@@ -227,13 +228,8 @@ def main():
     pl_high = pl_df.filter(pl.col("Stress Level") >= HIGH_STRESS)
     pl_low = pl_df.filter(pl.col("Stress Level") <= LOW_STRESS)
 
-    print("\nHigh-stress records:", pl_high.height)
-    print("Average sleep duration:", round(pl_high["Sleep Duration"].mean(), 2))
-    print("Average sleep quality:", round(pl_high["Quality of Sleep"].mean(), 2))
-
-    print("\nLow-stress records:", pl_low.height)
-    print("Average sleep duration:", round(pl_low["Sleep Duration"].mean(), 2))
-    print("Average sleep quality:", round(pl_low["Quality of Sleep"].mean(), 2))
+    print_group_summary("High-stress", pl_high)
+    print_group_summary("Low-stress", pl_low)
 
     print("\nRecords with under 6 hours of sleep:")
     print(
