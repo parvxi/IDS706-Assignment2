@@ -117,6 +117,7 @@ def test_full_pipeline():
         "average_sleep_quality_by_stress.png",
         "bmi_vs_sleep_disorder.png",
         "stress_vs_quality.png",
+        "factor_correlations.png",
     ]:
         path = os.path.join("images", plot)
         # the plot must be saved again by main(), not just left over from before

@@ -114,7 +114,7 @@ def save_plot(filename):
 
 
 def make_plots(df):
-    """Create and save the three plots used in the README."""
+    """Create and save the four plots used in the README."""
     os.makedirs("images", exist_ok=True)
 
     # Main plot. Stress Level has few groups, so a bar chart compares their
@@ -233,6 +233,15 @@ def main():
     print("BMI categories after merging:")
     print(df["BMI Category"].value_counts())
 
+    print("\nOutliers per numeric column (IQR rule):")
+    for column in FEATURES:
+        print(f"{column}: {len(find_outliers(df, column))}")
+
+    # FINDING 4: Only Heart Rate has outliers (15 records, 80-86 bpm).
+    # I kept them: 80-86 bpm is still a normal resting heart rate, and
+    # most of these people are overweight or obese with sleep apnea,
+    # so they are real cases, not data errors.
+
     # --- Explore ---
 
     section("4. EXPLORE")
@@ -327,15 +336,6 @@ def main():
         .sort("BMI Category")
     )
 
-    print("\nOutliers per numeric column (IQR rule):")
-    for column in FEATURES:
-        print(f"{column}: {len(find_outliers(df, column))}")
-
-    # FINDING 4: Only Heart Rate has outliers (15 records, 80-86 bpm).
-    # I kept them: 80-86 bpm is still a normal resting heart rate, and
-    # most of these people are overweight or obese with sleep apnea,
-    # so they are real cases, not data errors.
-
     # --- Performance comparison ---
 
     section("7. PANDAS VS POLARS PERFORMANCE")
@@ -397,6 +397,13 @@ def main():
 
     print("\nWhich factors line up with sleep quality (Spearman):")
     print(rank_factors(df).round(2))
+
+    # FINDING 5: Stress Level and Sleep Duration line up with sleep quality
+    # the most, and Daily Steps barely at all. I used Spearman because
+    # sleep quality and stress are 1-10 ratings, not exact measurements.
+    # I did not use the regression coefficients for this: Systolic and
+    # Diastolic are 0.97 correlated, so the model splits their effect into
+    # a big positive and a big negative weight (multicollinearity).
 
     # I chose linear regression as a simple first model because my target
     # and the features I selected are numeric.
