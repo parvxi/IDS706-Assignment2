@@ -6,8 +6,7 @@ import pandas as pd
 import pytest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-
-import EDA_Dataset as eda
+import EDA_Dataset as eda  # noqa: E402
 
 CSV = os.path.join(
     os.path.dirname(__file__), "..", "data", "Sleep_health_and_lifestyle_dataset.csv"

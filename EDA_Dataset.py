@@ -137,10 +137,16 @@ def main():
 
     # FINDING 1: Sleep Disorder has 219 missing values because pandas reads
     # "None" as NaN. I don't drop them because that would remove 219 of 374
-    # records and leave only Insomnia and Sleep Apnea cases. So we will have only people with disorders, instead I will fill the missing values with "No Disorder" to keep the full dataset for analysis.
+    # records and leave only Insomnia and Sleep Apnea cases.
+    # So we will have only people with disorders,
+    # instead I will fill the missing values with "No Disorder"
+    # to keep the full dataset for analysis.
 
-    # FINDING 2: No rows are fully identical because Person ID is unique. If I ignore Person ID, 242 rows repeat an earlier profile, leaving 132 distinct profiles
-    # I'll keep them for the main analysis but run the regression again without them just to test how much they affect the results.
+    # FINDING 2: No rows are fully identical because Person ID is unique.
+    #  If I ignore Person ID, 242 rows repeat an earlier profile,
+    #  leaving 132 distinct profiles
+    # I'll keep them for the main analysis but run the regression again without them
+    #  just to test how much they affect the results.
 
     section("3. CLEAN")
     df = clean_data(df)
@@ -303,7 +309,8 @@ def main():
         print("Polars was faster in this small test.")
 
     print(
-        "The dataset has only 374 rows, so this is practice rather than a real benchmark."
+        "The dataset has only 374 rows, "
+        "so this is practice rather than a real benchmark."
     )
 
     # --- Machine learning ---
@@ -317,7 +324,8 @@ def main():
 
     # FINDING 3: R-squared dropped from about 0.93 to 0.90 after removing
     # repeated profiles, so the repeated rows are not the main reason the
-    # model performs well. Stress Level has a strong negative relationship with Quality of Sleep in this dataset.
+    # model performs well. Stress Level has a strong negative relationship
+    #  with Quality of Sleep in this dataset.
 
     print("\nCorrelation between stress and sleep quality:")
     print(df[["Stress Level", "Quality of Sleep"]].corr().round(2))

@@ -1,0 +1,2 @@
+- flake8: 23 issues at first, mostly line length because black uses 88 and flake8 79.
+  Added .flake8 config. Fixed 5 long comments by hand. black had nothing to change.
