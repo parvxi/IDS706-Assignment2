@@ -123,4 +123,19 @@ def test_full_pipeline():
         assert os.path.getmtime(path) >= start
 
 
+def test_print_group_summary(capsys):
+    group = pd.DataFrame(
+        {
+            "Sleep Duration": [6.0, 8.0],
+            "Quality of Sleep": [5, 7],
+        }
+    )
+    eda.print_group_summary("Test", group)
+
+    printed = capsys.readouterr().out
+    assert "Test records: 2" in printed
+    assert "Average sleep duration: 7.0" in printed
+    assert "Average sleep quality: 6.0" in printed
+
+
 # to run write "pytest" in the terminal
