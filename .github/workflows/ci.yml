@@ -4,19 +4,39 @@ on:
   push:
     branches: [main]
   pull_request:
+  schedule:
+    - cron: "0 9 * * 1"   # every Monday at 09:00 UTC
+  workflow_dispatch:       # adds a "Run workflow" button on GitHub
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install linters
+        run: pip install black flake8
+      - name: Check formatting with black
+        run: black --check EDA_Dataset.py tests/
+      - name: Lint with flake8
+        run: flake8 EDA_Dataset.py tests/
+
   test:
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        python-version: ["3.12", "3.13", "3.14"]
     steps:
       - name: Check out the code
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: ${{ matrix.python-version }}
+          cache: pip
 
       - name: Install dependencies
         run: pip install -r requirements.txt
