@@ -19,7 +19,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_absolute_error, r2_score
 from sklearn.model_selection import train_test_split
 
-CSV = "data/Sleep_health_and_lifestyle_dataset.csv"
+DATA_PATH = "data/Sleep_health_and_lifestyle_dataset.csv"
 
 pd.set_option("display.max_columns", None)
 pd.set_option("display.width", 200)
@@ -45,11 +45,15 @@ FEATURES = [  # features, x
 ]
 TARGET = "Quality of Sleep"  # label, y
 
+# Thresholds I chose for grouping records (stress is on a 1-10 scale)
+HIGH_STRESS = 7  # stress level 7 or above counts as high stress
+LOW_STRESS = 4  # stress level 4 or below counts as low stress
+SHORT_SLEEP_HOURS = 6  # less than 6 hours counts as short sleep
 
 # --- Load ---
 
 
-def load_data(path=CSV):
+def load_data(path=DATA_PATH):
     """Read the raw CSV into a pandas DataFrame."""
     return pd.read_csv(path)
 
@@ -170,8 +174,8 @@ def main():
 
     print(stress_summary(df).round(2))
 
-    high_stress = df[df["Stress Level"] >= 7]
-    low_stress = df[df["Stress Level"] <= 4]
+    high_stress = df[df["Stress Level"] >= HIGH_STRESS]
+    low_stress = df[df["Stress Level"] <= LOW_STRESS]
 
     print("\nHigh-stress records:", len(high_stress))
     print("Average sleep duration:", round(high_stress["Sleep Duration"].mean(), 2))
@@ -181,7 +185,7 @@ def main():
     print("Average sleep duration:", round(low_stress["Sleep Duration"].mean(), 2))
     print("Average sleep quality:", round(low_stress["Quality of Sleep"].mean(), 2))
 
-    short_sleep = df[df["Sleep Duration"] < 6]
+    short_sleep = df[df["Sleep Duration"] < SHORT_SLEEP_HOURS]
     print("\nRecords with under 6 hours of sleep:")
     print(
         short_sleep[
@@ -207,7 +211,7 @@ def main():
     section("6. POLARS ANALYSIS")
 
     # Polars keeps "None" as text, so tell it to read that as null to match pandas.
-    pl_df = pl.read_csv(CSV, null_values={"Sleep Disorder": "None"})
+    pl_df = pl.read_csv(DATA_PATH, null_values={"Sleep Disorder": "None"})
     pl_df = pl_df.with_columns(
         pl.col("Sleep Disorder").fill_null("No Disorder"),
         pl.col("BMI Category").replace("Normal Weight", "Normal"),
@@ -220,8 +224,8 @@ def main():
         .sort("Stress Level")
     )
 
-    pl_high = pl_df.filter(pl.col("Stress Level") >= 7)
-    pl_low = pl_df.filter(pl.col("Stress Level") <= 4)
+    pl_high = pl_df.filter(pl.col("Stress Level") >= HIGH_STRESS)
+    pl_low = pl_df.filter(pl.col("Stress Level") <= LOW_STRESS)
 
     print("\nHigh-stress records:", pl_high.height)
     print("Average sleep duration:", round(pl_high["Sleep Duration"].mean(), 2))
@@ -233,7 +237,7 @@ def main():
 
     print("\nRecords with under 6 hours of sleep:")
     print(
-        pl_df.filter(pl.col("Sleep Duration") < 6).select(
+        pl_df.filter(pl.col("Sleep Duration") < SHORT_SLEEP_HOURS).select(
             ["Age", "Occupation", "Sleep Duration", "Quality of Sleep", "Stress Level"]
         )
     )
@@ -267,9 +271,9 @@ def main():
 
     def pandas_analysis():
         df.groupby("Stress Level")["Quality of Sleep"].mean()
-        df[df["Stress Level"] >= 7]
-        df[df["Stress Level"] <= 4]
-        df[df["Sleep Duration"] < 6]
+        df[df["Stress Level"] >= HIGH_STRESS]
+        df[df["Stress Level"] <= LOW_STRESS]
+        df[df["Sleep Duration"] < SHORT_SLEEP_HOURS]
         df.groupby("BMI Category").agg(
             average_sleep=("Sleep Duration", "mean"),
             average_quality=("Quality of Sleep", "mean"),
@@ -278,9 +282,9 @@ def main():
 
     def polars_analysis():
         pl_df.group_by("Stress Level").agg(pl.col("Quality of Sleep").mean())
-        pl_df.filter(pl.col("Stress Level") >= 7)
-        pl_df.filter(pl.col("Stress Level") <= 4)
-        pl_df.filter(pl.col("Sleep Duration") < 6)
+        pl_df.filter(pl.col("Stress Level") >= HIGH_STRESS)
+        pl_df.filter(pl.col("Stress Level") <= LOW_STRESS)
+        pl_df.filter(pl.col("Sleep Duration") < SHORT_SLEEP_HOURS)
         pl_df.group_by("BMI Category").agg(
             pl.col("Sleep Duration").mean(),
             pl.col("Quality of Sleep").mean(),
