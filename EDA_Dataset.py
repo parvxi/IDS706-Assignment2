@@ -87,6 +87,22 @@ def print_group_summary(label, group):
     print("Average sleep quality:", round(group["Quality of Sleep"].mean(), 2))
 
 
+def find_outliers(df, column):
+    """Return rows outside the IQR range (1.5 x IQR below Q1 or above Q3)."""
+    q1 = df[column].quantile(0.25)
+    q3 = df[column].quantile(0.75)
+    iqr = q3 - q1
+    lower = q1 - 1.5 * iqr
+    upper = q3 + 1.5 * iqr
+    return df[(df[column] < lower) | (df[column] > upper)]
+
+
+def rank_factors(df, method="spearman"):
+    """Correlation of each feature with sleep quality, strongest first."""
+    corr = df[FEATURES].corrwith(df[TARGET], method=method)
+    return corr.reindex(corr.abs().sort_values(ascending=False).index)
+
+
 # --- Visualisation ---
 
 
@@ -127,6 +143,19 @@ def make_plots(df):
     plt.xlabel("Stress Level (1-10)")
     plt.ylabel("Quality of Sleep (1-10)")
     save_plot("stress_vs_quality.png")
+
+    # Answers the research question: which factors matter most?
+    # Red = more of it means worse sleep, blue = better sleep.
+    factors = rank_factors(df).iloc[::-1]
+    factors.plot(
+        kind="barh",
+        color=["tab:red" if value < 0 else "tab:blue" for value in factors],
+        figsize=(8, 5),
+    )
+    plt.axvline(0, color="black", linewidth=0.8)
+    plt.title("Which Factors Line Up With Sleep Quality?")
+    plt.xlabel("Spearman correlation with Quality of Sleep")
+    save_plot("factor_correlations.png")
 
 
 # --- Machine learning ---
@@ -298,6 +327,15 @@ def main():
         .sort("BMI Category")
     )
 
+    print("\nOutliers per numeric column (IQR rule):")
+    for column in FEATURES:
+        print(f"{column}: {len(find_outliers(df, column))}")
+
+    # FINDING 4: Only Heart Rate has outliers (15 records, 80-86 bpm).
+    # I kept them: 80-86 bpm is still a normal resting heart rate, and
+    # most of these people are overweight or obese with sleep apnea,
+    # so they are real cases, not data errors.
+
     # --- Performance comparison ---
 
     section("7. PANDAS VS POLARS PERFORMANCE")
@@ -356,6 +394,9 @@ def main():
     # --- Machine learning ---
 
     section("8. MACHINE LEARNING")
+
+    print("\nWhich factors line up with sleep quality (Spearman):")
+    print(rank_factors(df).round(2))
 
     # I chose linear regression as a simple first model because my target
     # and the features I selected are numeric.

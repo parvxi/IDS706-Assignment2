@@ -138,4 +138,22 @@ def test_print_group_summary(capsys):
     assert "Average sleep quality: 6.0" in printed
 
 
+def test_find_outliers():
+    df = pd.DataFrame({"Heart Rate": [70, 71, 72, 73, 74, 150]})
+    outliers = eda.find_outliers(df, "Heart Rate")
+
+    assert len(outliers) == 1
+    assert outliers["Heart Rate"].iloc[0] == 150
+
+
+def test_rank_factors():
+    df = eda.clean_data(eda.load_data(CSV))
+    ranking = eda.rank_factors(df)
+
+    assert len(ranking) == len(eda.FEATURES)
+    assert ranking.index[0] == "Stress Level"
+    # sorted by strength, strongest first
+    assert list(ranking.abs()) == sorted(ranking.abs(), reverse=True)
+
+
 # to run write "pytest" in the terminal
