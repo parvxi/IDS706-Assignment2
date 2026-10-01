@@ -24,8 +24,6 @@ DATA_PATH = "data/Sleep_health_and_lifestyle_dataset.csv"
 pd.set_option("display.max_columns", None)
 pd.set_option("display.width", 200)
 
-os.makedirs("images", exist_ok=True)
-
 
 def section(name):
     print("\n" + "=" * 60)
@@ -87,6 +85,48 @@ def print_group_summary(label, group):
     print(f"\n{label} records:", len(group))
     print("Average sleep duration:", round(group["Sleep Duration"].mean(), 2))
     print("Average sleep quality:", round(group["Quality of Sleep"].mean(), 2))
+
+
+# --- Visualisation ---
+
+
+def save_plot(filename):
+    """Tidy the layout, save the current plot into images/, and close it."""
+    plt.tight_layout()
+    plt.savefig(os.path.join("images", filename), dpi=150)
+    plt.close()
+
+
+def make_plots(df):
+    """Create and save the three plots used in the README."""
+    os.makedirs("images", exist_ok=True)
+
+    # Main plot. Stress Level has few groups, so a bar chart compares their
+    # average sleep quality directly, and it matches the question above.
+    stress_summary(df).plot(kind="bar", figsize=(8, 5))
+    plt.title("Average Sleep Quality by Stress Level")
+    plt.xlabel("Stress Level")
+    plt.ylabel("Average Quality of Sleep")
+    plt.xticks(rotation=0)
+    save_plot("average_sleep_quality_by_stress.png")
+
+    # Stacked bars show group size and the disorder split inside each group.
+    pd.crosstab(df["BMI Category"], df["Sleep Disorder"]).plot(
+        kind="bar", stacked=True, figsize=(9, 5)
+    )
+    plt.title("Sleep Disorders by BMI Category")
+    plt.xlabel("BMI Category")
+    plt.ylabel("Number of Records")
+    plt.xticks(rotation=0)
+    plt.legend(title="Sleep Disorder")
+    save_plot("bmi_vs_sleep_disorder.png")
+
+    # Same relationship as the main plot, but showing spread within each level.
+    sns.boxplot(data=df, x="Stress Level", y="Quality of Sleep")
+    plt.title("Sleep Quality by Stress Level")
+    plt.xlabel("Stress Level (1-10)")
+    plt.ylabel("Quality of Sleep (1-10)")
+    save_plot("stress_vs_quality.png")
 
 
 # --- Machine learning ---
@@ -333,40 +373,7 @@ def main():
     # --- Visualisation ---
 
     section("9. VISUALISATION")
-
-    # Main plot. Stress Level has few groups, so a bar chart compares their
-    # average sleep quality directly, and it matches the question above.
-    stress_summary(df).plot(kind="bar", figsize=(8, 5))
-    plt.title("Average Sleep Quality by Stress Level")
-    plt.xlabel("Stress Level")
-    plt.ylabel("Average Quality of Sleep")
-    plt.xticks(rotation=0)
-    plt.tight_layout()
-    plt.savefig("images/average_sleep_quality_by_stress.png", dpi=150)
-    plt.close()
-
-    # Stacked bars show group size and the disorder split inside each group.
-    pd.crosstab(df["BMI Category"], df["Sleep Disorder"]).plot(
-        kind="bar", stacked=True, figsize=(9, 5)
-    )
-    plt.title("Sleep Disorders by BMI Category")
-    plt.xlabel("BMI Category")
-    plt.ylabel("Number of Records")
-    plt.xticks(rotation=0)
-    plt.legend(title="Sleep Disorder")
-    plt.tight_layout()
-    plt.savefig("images/bmi_vs_sleep_disorder.png", dpi=150)
-    plt.close()
-
-    # Same relationship as the main plot, but showing spread within each level.
-    sns.boxplot(data=df, x="Stress Level", y="Quality of Sleep")
-    plt.title("Sleep Quality by Stress Level")
-    plt.xlabel("Stress Level (1-10)")
-    plt.ylabel("Quality of Sleep (1-10)")
-    plt.tight_layout()
-    plt.savefig("images/stress_vs_quality.png", dpi=150)
-    plt.close()
-
+    make_plots(df)
     print("\nPlots saved to the images/ folder.")
 
     return df
